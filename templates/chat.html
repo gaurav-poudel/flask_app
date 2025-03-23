@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blys Chatbot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .chat-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            max-width: 70%;
+            clear: both;
+        }
+        .user-message {
+            background-color: #DCF8C6;
+            float: right;
+        }
+        .bot-message {
+            background-color: #F1F0F0;
+            float: left;
+        }
+        .input-container {
+            display: flex;
+        }
+        #message-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        #send-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #send-button:hover {
+            background-color: #45a049;
+        }
+        .home-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+        .home-link:hover {
+            text-decoration: underline;
+        }
+        .example-queries {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .example-query {
+            display: inline-block;
+            background-color: #f8f8f8;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .example-query:hover {
+            background-color: #e8e8e8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Blys Chatbot</h1>
+    
+    <div class="chat-container" id="chat-container">
+        <div class="message bot-message">Hello! Welcome to Blys. How can I assist you today?</div>
+    </div>
+    
+    <div class="input-container">
+        <input type="text" id="message-input" placeholder="Type your message here...">
+        <button id="send-button">Send</button>
+    </div>
+    
+    <div class="example-queries">
+        <p>Try asking about:</p>
+        <div class="example-query" onclick="useExample(this)">Can I reschedule my booking?</div>
+        <div class="example-query" onclick="useExample(this)">I want to book a massage</div>
+        <div class="example-query" onclick="useExample(this)">What services do you offer?</div>
+        <div class="example-query" onclick="useExample(this)">How much is a facial?</div>
+    </div>
+    
+    <a href="/" class="home-link">← Back to Home</a>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        
+        let sessionId = 'session_' + Math.random().toString(36).substring(2, 15);
+        
+        function addMessage(message, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+            messageDiv.textContent = message;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            addMessage(message, true);
+            messageInput.value = '';
+            
+            try {
+                const response = await fetch('/api/chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId
+                    })
+                });
+                
+                const data = await response.json();
+                addMessage(data.response, false);
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('Sorry, something went wrong. Please try again.', false);
+            }
+        }
+        
+        function useExample(element) {
+            messageInput.value = element.textContent;
+            messageInput.focus();
+        }
+        
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

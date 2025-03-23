@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blys AI Services</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .api-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Blys AI Services</h1>
+    
+    <div class="card">
+        <h2>Chatbot Interface</h2>
+        <p>Interact with our AI chatbot to book, reschedule, or get information about our services.</p>
+        <a href="/chat" class="button">Open Chatbot</a>
+    </div>
+    
+    <div class="card">
+        <h2>API Documentation</h2>
+        <p>Use our API to integrate our recommendation engine and chatbot into your applications.</p>
+        
+        <div class="api-section">
+            <h3>Chatbot API</h3>
+            <p><strong>Endpoint:</strong> <code>/api/chatbot</code></p>
+            <p><strong>Method:</strong> POST</p>
+            <p><strong>Request Body:</strong></p>
+            <pre><code>{
+  "message": "Can I reschedule my booking?",
+  "session_id": "user123"  // Optional
+}</code></pre>
+            <p><strong>Response:</strong></p>
+            <pre><code>{
+  "response": "Yes, you can reschedule your booking through the Blys app. Would you like me to assist you?",
+  "session_id": "user123"
+}</code></pre>
+        </div>
+        
+        <div class="api-section">
+            <h3>Recommendation API</h3>
+            <p><strong>Endpoint:</strong> <code>/api/recommend</code></p>
+            <p><strong>Method:</strong> POST</p>
+            <p><strong>Request Body:</strong></p>
+            <pre><code>{
+  "customer_id": 1001,
+  "top_n": 3  // Optional, defaults to 3
+}</code></pre>
+            <p><strong>Response:</strong></p>
+            <pre><code>{
+  "customer_id": 1001,
+  "current_service": "Swedish Massage",
+  "recommendations": [
+    {"service": "Facial", "score": 0.88},
+    {"service": "Wellness Package", "score": 0.75},
+    {"service": "Couple Massage", "score": 0.65}
+  ]
+}</code></pre>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3>Test the API</h3>
+        <p>You can test the recommend API with a simple form:</p>
+        
+        <form id="recommend-form">
+            <label for="customer-id">Customer ID:</label>
+            <input type="number" id="customer-id" name="customer-id" value="1001" min="1001" max="11000">
+            <button type="submit">Get Recommendations</button>
+        </form>
+        
+        <div id="result" style="margin-top: 15px; display: none;">
+            <h4>Recommendations:</h4>
+            <pre id="recommendations"></pre>
+        </div>
+        
+        <script>
+            document.getElementById('recommend-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const customerId = document.getElementById('customer-id').value;
+                
+                try {
+                    const response = await fetch('/api/recommend', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            customer_id: customerId
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    document.getElementById('recommendations').textContent = JSON.stringify(data, null, 2);
+                    document.getElementById('result').style.display = 'block';
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('recommendations').textContent = 'Error fetching recommendations';
+                    document.getElementById('result').style.display = 'block';
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
